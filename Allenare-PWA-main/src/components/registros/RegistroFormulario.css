@@ -1,0 +1,50 @@
+.registro-card {
+  padding: 1.5rem;
+  background-color: #d4edda; /* Mantiene el color de fondo verde claro */
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: 400px; /* Altura fija para el formulario */
+  display: flex;
+  flex-direction: column;
+}
+
+.registro-card h3 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.registro-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.registro-card input {
+  padding: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.7); /* Borde claro */
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.8); /* Fondo casi blanco */
+  font-size: 0.9rem;
+  color: #333; /* Color de texto más oscuro */
+}
+
+.registro-card input::placeholder {
+  color: #777; /* Color del placeholder */
+}
+
+.registro-card button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background-color: #4CAF50;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-top: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

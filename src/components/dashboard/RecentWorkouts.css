@@ -1,0 +1,26 @@
+.workouts-card {
+  padding: 1.5rem;
+  background-color: #fffacd;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.workouts-card h3 {
+  margin-top: 0;
+  font-size: 2rem;
+}
+
+.workouts-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.workouts-card li {
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.workouts-card li span:first-child {
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}

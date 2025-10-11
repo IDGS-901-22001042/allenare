@@ -1,0 +1,49 @@
+.distance-chart-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #ff6b6b, #e63946);
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: #fff;
+}
+
+.distance-text-group {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  min-width: 150px; /* Asegura un ancho mínimo para el texto */
+}
+
+.distance-text-group h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.distance-text-group .main-stat {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.distance-text-group .sub-stat {
+  font-size: 0.9rem;
+  font-weight: normal;
+  margin: 0;
+}
+
+.chart-placeholder {
+  width: 200px;
+  height: 100px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  margin-left: 1rem;
+  flex-grow: 1; /* Permite que el gráfico ocupe el espacio disponible */
+}
+
+.runner-icon {
+  font-size: 4rem;
+  margin-left: 1rem;
+}
