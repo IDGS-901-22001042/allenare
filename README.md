@@ -10,3 +10,4 @@ Currently, two official plugins are available:
 # Allenare-PWA
 
 A new PWA
+Allenare is a Fit training App for everyone
