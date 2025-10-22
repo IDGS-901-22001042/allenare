@@ -12,3 +12,4 @@ Currently, two official plugins are available:
 A new PWA
 Allenare is a Fit training App for everyone
 Testing Notifications and more
+Another Testing
