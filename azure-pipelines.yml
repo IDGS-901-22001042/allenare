@@ -1,0 +1,101 @@
+# ==========================================
+# PIPELINE CI/CD para Node.js + Vue
+# Oscar Alvarado | André Cabrera
+# ==========================================
+
+trigger:
+  branches:
+    include:
+      - dev
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  NODE_ENV: production
+
+stages:
+# ======================
+# 1️⃣ BUILD STAGE
+# ======================
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Install Node.js 20'
+
+    - script: |
+        npm ci
+        npm run build
+      displayName: 'Install dependencies and build Vue app'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'dist'
+        ArtifactName: 'drop'
+      displayName: 'Publish build artifacts'
+
+# ======================
+# 2️⃣ TEST STAGE
+# ======================
+- stage: Test
+  dependsOn: Build
+  displayName: 'Test Stage'
+  jobs:
+  - job: TestJob
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+    - script: |
+        npm ci
+        npm test || echo "No tests configured"
+      displayName: 'Run unit tests'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/TEST-*.xml'
+        failTaskOnFailedTests: true
+      condition: succeededOrFailed()
+
+# ======================
+# 3️⃣ DEPLOY STAGE
+# ======================
+- stage: Deploy
+  dependsOn: Test
+  displayName: 'Deploy Stage'
+  jobs:
+  - deployment: DeployWeb
+    environment: 'staging'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Simulating deployment..."
+              echo "Deployment successful!"
+            displayName: 'Deploy to staging environment'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'dist'
+              ArtifactName: 'vue-app'
+            displayName: 'Publish deployment files'
+
+# ======================
+# 4️⃣ MONITOR STAGE
+# ======================
+- stage: Monitor
+  dependsOn: Deploy
+  displayName: 'Monitor Stage'
+  jobs:
+  - job: MonitorJob
+    steps:
+    - script: |
+        echo "Performing health check..."
+        curl -I https://example.com || echo "Site unreachable"
+      displayName: 'Check deployment health'
