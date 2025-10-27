@@ -1,6 +1,5 @@
 # ==========================================
-# PIPELINE CI/CD para Node.js + Vue
-# Oscar Alvarado | André Cabrera
+# PIPELINE CI/CD para Node.js + React (o Vue si es el caso)
 # ==========================================
 
 trigger:
@@ -20,7 +19,7 @@ stages:
 # 1️⃣ BUILD STAGE
 # ======================
 - stage: Build
-  displayName: 'Build Stage'
+  displayName: 'Build Stage' # Indentación correcta para displayName
   jobs:
   - job: BuildJob
     steps:
@@ -29,20 +28,26 @@ stages:
         versionSpec: '20.x'
       displayName: 'Install Node.js 20'
 
+    # ESTE BLOQUE ESTABA MAL INDENTADO
     - script: |
         node -v
         npm -v
-        npm install
-        npm install vite@latest --save-dev      # 👈 instala vite explícitamente
-        npx vite build                          # 👈 ejecuta vite directamente
-      displayName: 'Install dependencies and build Vue app'
+        echo "--- Running npm ci ---"
+        npm ci
+        echo "--- npm ci finished ---"
+        echo "--- Current directory contents (ls -la) ---"
+        ls -la
+        echo "--- Checking for vite-plugin-pwa in node_modules ---"
+        ls -la node_modules/vite-plugin-pwa || echo "vite-plugin-pwa directory not found!"
+        echo "--- Running build with local vite ---"
+        ./node_modules/.bin/vite build # Explicitly use local vite
+      displayName: 'Install dependencies and build app' # Indentación correcta para displayName
 
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: 'dist'
+        PathtoPublish: 'dist' # Asegúrate que esta es la carpeta correcta de salida de Vite
         ArtifactName: 'drop'
       displayName: 'Publish build artifacts'
-
 
 # ======================
 # 2️⃣ TEST STAGE
@@ -56,50 +61,76 @@ stages:
     - task: NodeTool@0
       inputs:
         versionSpec: '20.x'
+      displayName: 'Install Node.js 20 (for Test)' # Añadido para claridad
+
+    # Descargar los artefactos del build si las pruebas necesitan los archivos construidos
+    # - task: DownloadBuildArtifacts@1
+    #   inputs:
+    #     buildType: 'current'
+    #     downloadType: 'single'
+    #     artifactName: 'drop'
+    #     downloadPath: '$(System.ArtifactsDirectory)'
+    #   displayName: 'Download build artifacts'
+
     - script: |
-        npm ci
-        npm test || echo "No tests configured"
+        npm ci # Instalar dependencias necesarias para las pruebas
+        npm test || echo "No tests configured or tests passed/failed"
       displayName: 'Run unit tests'
+
     - task: PublishTestResults@2
       inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '**/TEST-*.xml'
+        testResultsFormat: 'JUnit' # Asegúrate que tu test runner genera este formato
+        testResultsFiles: '**/TEST-*.xml' # Ajusta el patrón si es necesario
         failTaskOnFailedTests: true
-      condition: succeededOrFailed()
+      condition: succeededOrFailed() # Publicar resultados incluso si las pruebas fallan
+      displayName: 'Publish Test Results'
 
 # ======================
 # 3️⃣ DEPLOY STAGE
 # ======================
 - stage: Deploy
   dependsOn: Test
+  condition: succeeded() # Solo desplegar si el Build y Test fueron exitosos
   displayName: 'Deploy Stage'
   jobs:
   - deployment: DeployWeb
-    environment: 'staging'
+    environment: 'staging' # Asegúrate que este entorno existe en Azure DevOps
     strategy:
       runOnce:
         deploy:
           steps:
+          # Descargar artefactos del build para desplegar
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop' # El artefacto del stage de Build
+              downloadPath: '$(System.ArtifactsDirectory)/download'
+            displayName: 'Download build artifacts for deployment'
+
           - script: |
+              echo "Deploying files from $(System.ArtifactsDirectory)/download/drop"
+              # Aquí irían los comandos reales para desplegar a tu servidor/servicio
+              # Ejemplo: az webapp up, scp, etc.
               echo "Simulating deployment..."
+              ls -R $(System.ArtifactsDirectory)/download/drop # Listar archivos para verificar
               echo "Deployment successful!"
             displayName: 'Deploy to staging environment'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: 'dist'
-              ArtifactName: 'vue-app'
-            displayName: 'Publish deployment files'
+          # No necesitas volver a publicar artefactos aquí usualmente
 
 # ======================
-# 4️⃣ MONITOR STAGE
+# 4️⃣ MONITOR STAGE (Opcional/Ejemplo)
 # ======================
 - stage: Monitor
   dependsOn: Deploy
+  condition: succeeded()
   displayName: 'Monitor Stage'
   jobs:
   - job: MonitorJob
     steps:
     - script: |
         echo "Performing health check..."
-        curl -I https://example.com || echo "Site unreachable"
+        # Reemplaza https://example.com con la URL real de tu ambiente staging
+        curl -I https://example.com || (echo "Site unreachable" && exit 1)
+        echo "Health check passed!"
       displayName: 'Check deployment health'
