@@ -30,8 +30,11 @@ stages:
       displayName: 'Install Node.js 20'
 
     - script: |
+        node -v
+        npm -v
         npm install
-        npm run build
+        npm install vite@latest --save-dev      # 👈 instala vite explícitamente
+        npx vite build                          # 👈 ejecuta vite directamente
       displayName: 'Install dependencies and build Vue app'
 
     - task: PublishBuildArtifacts@1
@@ -39,6 +42,7 @@ stages:
         PathtoPublish: 'dist'
         ArtifactName: 'drop'
       displayName: 'Publish build artifacts'
+
 
 # ======================
 # 2️⃣ TEST STAGE
