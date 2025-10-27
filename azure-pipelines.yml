@@ -33,10 +33,11 @@ stages:
         node -v
         npm -v
         echo "--- Cleaning npm cache ---"
-        npm cache clean --force # Add cache cleaning
-        echo "--- Running npm ci ---"
-        npm ci
-        echo "--- npm ci finished ---"
+        npm cache clean --force
+        echo "--- Running npm install (diagnostic) ---"
+        # Cambia esta línea:
+        npm install --legacy-peer-deps # O intenta solo 'npm install'
+        echo "--- npm install finished ---"
         echo "--- Current directory contents (ls -la) ---"
         ls -la
         echo "--- Checking for vite-plugin-pwa in node_modules ---"
