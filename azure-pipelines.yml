@@ -32,6 +32,8 @@ stages:
     - script: |
         node -v
         npm -v
+        echo "--- Cleaning npm cache ---"
+        npm cache clean --force # Add cache cleaning
         echo "--- Running npm ci ---"
         npm ci
         echo "--- npm ci finished ---"
@@ -39,9 +41,11 @@ stages:
         ls -la
         echo "--- Checking for vite-plugin-pwa in node_modules ---"
         ls -la node_modules/vite-plugin-pwa || echo "vite-plugin-pwa directory not found!"
+        echo "--- Checking for vite binary ---"
+        ls -la node_modules/.bin/vite || echo "vite binary not found!"
         echo "--- Running build with local vite ---"
         ./node_modules/.bin/vite build # Explicitly use local vite
-      displayName: 'Install dependencies and build app' # Indentación correcta para displayName
+      displayName: 'Install dependencies and build app'
 
     - task: PublishBuildArtifacts@1
       inputs:
