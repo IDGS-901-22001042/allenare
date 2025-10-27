@@ -20,29 +20,27 @@ stages:
 # 1️⃣ BUILD STAGE
 # ======================
 - stage: Build
-  displayName: 'Build Stage'
-  jobs:
-  - job: BuildJob
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '20.x'
-      displayName: 'Install Node.js 20'
+      displayName: 'Build Stage'
+      jobs:
+      - job: BuildJob
+        steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '20.x'
+          displayName: 'Install Node.js 20'
 
-    - script: |
-        node -v
-        npm -v
-        npm install --force
-        npm install vite@latest --save-dev
-        npm install vite-plugin-pwa@latest --save-dev
-        npx vite build
-      displayName: 'Install dependencies and build Vue app'
+        - script: |
+            node -v
+            npm -v
+            npm ci  # Use 'npm ci' for reliable installs in CI
+            npx vite build
+          displayName: 'Install dependencies and build app' # Updated name
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: 'dist'
-        ArtifactName: 'drop'
-      displayName: 'Publish build artifacts'
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: 'dist'
+            ArtifactName: 'drop'
+          displayName: 'Publish build artifacts'
 
 # ======================
 # 2️⃣ TEST STAGE
