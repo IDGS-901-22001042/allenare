@@ -28,7 +28,7 @@ stages:
         versionSpec: '20.x'
       displayName: 'Install Node.js 20'
 
-    - script: |
+- script: |
             node -v
             npm -v
             echo "--- Running npm ci ---"
