@@ -33,7 +33,9 @@ stages:
         node -v
         npm -v
         npm install --force
-        npx vite build   # 👈 ejecuta vite desde node_modules/.bin, sin depender del PATH
+        npm install vite@latest --save-dev
+        npm install vite-plugin-pwa@latest --save-dev
+        npx vite build
       displayName: 'Install dependencies and build Vue app'
 
     - task: PublishBuildArtifacts@1
@@ -41,7 +43,6 @@ stages:
         PathtoPublish: 'dist'
         ArtifactName: 'drop'
       displayName: 'Publish build artifacts'
-
 
 # ======================
 # 2️⃣ TEST STAGE
