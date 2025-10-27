@@ -32,7 +32,7 @@ stages:
     - script: |
         node -v
         npm -v
-        npm install
+        npm install --force
         npm install vite@latest --save-dev      # 👈 instala vite explícitamente
         npx vite build                          # 👈 ejecuta vite directamente
       displayName: 'Install dependencies and build Vue app'
