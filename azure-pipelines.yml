@@ -30,7 +30,7 @@ stages:
       displayName: 'Install Node.js 20'
 
     - script: |
-        npm ci
+        npm install
         npm run build
       displayName: 'Install dependencies and build Vue app'
 
