@@ -29,11 +29,18 @@ stages:
       displayName: 'Install Node.js 20'
 
     - script: |
-        node -v
-        npm -v
-        npm ci  # Use 'npm ci' for reliable installs in CI
-        npx vite build
-      displayName: 'Install dependencies and build app'
+            node -v
+            npm -v
+            echo "--- Running npm ci ---"
+            npm ci
+            echo "--- npm ci finished ---"
+            echo "--- Current directory contents (ls -la) ---"
+            ls -la
+            echo "--- Checking for vite-plugin-pwa in node_modules ---"
+            ls -la node_modules/vite-plugin-pwa || echo "vite-plugin-pwa directory not found!"
+            echo "--- Running build with local vite ---"
+            ./node_modules/.bin/vite build # Explicitly use local vite
+          displayName: 'Install dependencies and build app'
 
     - task: PublishBuildArtifacts@1
       inputs:
