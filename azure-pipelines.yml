@@ -33,13 +33,14 @@ stages:
         node -v
         npm -v
         echo "--- Running npm ci ---"
-        npm ci # Go back to using npm ci
+        npm ci # Mantenemos npm ci para instalaciones limpias
         echo "--- npm ci finished ---"
-        echo "--- Checking node_modules contents ---"
-        ls -la node_modules/.bin # Esto es útil para depuración, pero se puede remover una vez que el pipeline sea estable.
+        # Ya no necesitamos verificar .bin específicamente si usamos npx
+        # echo "--- Checking node_modules contents ---"
+        # ls -la node_modules/.bin 
         echo "--- Running production build ---"
-        # Usar la variable NODE_ENV definida globalmente o aquí directamente
-        ./node_modules/.bin/vite build
+        # 👇 CAMBIO PRINCIPAL: Usar npx para ejecutar vite
+        npx vite build 
       displayName: 'Install dependencies and build app'
 
     - task: PublishBuildArtifacts@1
