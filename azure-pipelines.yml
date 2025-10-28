@@ -21,6 +21,7 @@ stages:
 # ======================
 - stage: Build
   displayName: 'Build Stage'
+  # NO HAY SECCIÓN 'variables:' global aquí arriba
   jobs:
   - job: BuildJob
     steps:
@@ -32,15 +33,19 @@ stages:
     - script: |
         node -v
         npm -v
-        echo "--- Running npm install ---"
-        # Cambia npm ci por npm install para probar
-        npm install 
-        echo "--- npm install finished ---"
-        echo "--- Running production build ---"
-        npx vite build 
+        echo "--- Running npm ci ---"
+        npm ci # Usar npm ci
+        echo "--- npm ci finished ---"
+        # Opcional: puedes mantener o quitar el 'ls -la node_modules/.bin'
+        # echo "--- Checking node_modules contents ---"
+        # ls -la node_modules/.bin
+        echo "--- Running build ---"
+        npx vite build # Usar npx
       displayName: 'Install dependencies and build app'
 
     - task: PublishBuildArtifacts@1
+      # ... resto de la tarea ...
+# ... resto del pipeline ...
       inputs:
         PathtoPublish: 'dist' # Asegúrate que esta es la carpeta correcta de salida de Vite
         ArtifactName: 'drop'
