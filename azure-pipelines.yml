@@ -32,14 +32,11 @@ stages:
     - script: |
         node -v
         npm -v
-        echo "--- Running npm ci ---"
-        npm ci # Mantenemos npm ci para instalaciones limpias
-        echo "--- npm ci finished ---"
-        # Ya no necesitamos verificar .bin específicamente si usamos npx
-        # echo "--- Checking node_modules contents ---"
-        # ls -la node_modules/.bin 
+        echo "--- Running npm install ---"
+        # Cambia npm ci por npm install para probar
+        npm install 
+        echo "--- npm install finished ---"
         echo "--- Running production build ---"
-        # 👇 CAMBIO PRINCIPAL: Usar npx para ejecutar vite
         npx vite build 
       displayName: 'Install dependencies and build app'
 
