@@ -52,37 +52,42 @@ stages:
 # 2️⃣ TEST STAGE
 # ======================
 - stage: Test
-  dependsOn: Build
-  displayName: 'Test Stage'
+  dependsOn: Build # Esta etapa depende de que el Build termine
+  displayName: 'Test Stage' # Nombre de la etapa
   jobs:
-  - job: TestJob
-    steps:
+  - job: TestJob # Nombre del trabajo dentro de la etapa
+    steps: # Pasos a ejecutar en este trabajo
+    # Instala Node.js para poder usar npm
     - task: NodeTool@0
       inputs:
-        versionSpec: '20.x'
-      displayName: 'Install Node.js 20 (for Test)' # Añadido para claridad
+        versionSpec: '20.x' # Versión de Node.js a usar
+      displayName: 'Install Node.js 20 (for Test)' # Nombre de este paso
 
-    # Descargar los artefactos del build si las pruebas necesitan los archivos construidos
-    # - task: DownloadBuildArtifacts@1
-    #   inputs:
-    #     buildType: 'current'
-    #     downloadType: 'single'
-    #     artifactName: 'drop'
-    #     downloadPath: '$(System.ArtifactsDirectory)'
-    #   displayName: 'Download build artifacts'
-
+    # Paso para instalar dependencias y ejecutar las pruebas
     - script: |
         echo "--- Installing dependencies for tests ---"
-        npm ci # Instalar dependencias necesarias para las pruebas (incluyendo devDependencies)
-        echo "--- Running unit tests ---"
-        npm test # Esto fallará la tarea si las pruebas fallan
-    - script: |
-      displayName: 'Publish Test Results'
-      condition: always() # Publicar resultados incluso si las pruebas fallan
+        # Usa npm ci para instalar limpiamente basándose en package-lock.json
+        # Esto instalará tanto dependencias normales como de desarrollo (devDependencies)
+        npm ci
+        echo "--- Running tests ---"
+        # Ejecuta el script 'test' definido en tu package.json
+        # Este comando debe estar configurado para correr tus pruebas y generar el reporte JUnit
+        npm test
+      displayName: 'Install Deps & Run Tests' # Nombre de este paso
+
+    # Tarea separada para publicar los resultados de las pruebas
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results' # Nombre de este paso
+      # condition: succeededOrFailed() # Publica si las pruebas pasan o fallan
+      condition: always() # Publica siempre, sin importar el resultado de las pruebas
       inputs:
-        testResultsFormat: 'JUnit' # Asegúrate que tu test runner genera este formato
-        testResultsFiles: '**/TEST-*.xml' # Ajusta el patrón si es necesario
-        failTaskOnFailedTests: true # Asegura que la tarea falle si hay pruebas fallidas
+        # Formato del reporte que genera tu herramienta de pruebas
+        testResultsFormat: 'JUnit'
+        # Patrón para encontrar los archivos de reporte. 'junit.xml' es común.
+        # Ajusta si tu herramienta usa otro nombre como 'TEST-*.xml'
+        testResultsFiles: '**/junit.xml'
+        # Si es true, la tarea (y potencialmente el pipeline) fallará si alguna prueba falla.
+        failTaskOnFailedTests: true
 
 # ======================
 # 3️⃣ DEPLOY STAGE
