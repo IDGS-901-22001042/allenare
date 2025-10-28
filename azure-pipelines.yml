@@ -30,16 +30,20 @@ stages:
         versionSpec: '20.x'
       displayName: 'Install Node.js 20'
 
+    # ... (task: NodeTool@0) ...
+
     - script: |
-        # ... node -v, npm -v ...
-        echo "--- Running npm ci ---"
-        npm ci
-        echo "--- npm ci finished ---"
-        echo "--- Listing installed modules (checking for vite-plugin-pwa) ---"
-        ls -l node_modules/vite-plugin-pwa || echo "vite-plugin-pwa NOT FOUND in node_modules"
+        node -v
+        npm -v
+        echo "--- Running npm install ---"
+        # 👇 Cambia de 'npm ci' a 'npm install'
+        npm install 
+        echo "--- npm install finished ---"
         echo "--- Running build ---"
-        npx vite build
+        npx vite build 
       displayName: 'Install dependencies and build app'
+
+# ... (task: PublishBuildArtifacts@1) ...
 
     - task: PublishBuildArtifacts@1
       # ... resto de la tarea ...
