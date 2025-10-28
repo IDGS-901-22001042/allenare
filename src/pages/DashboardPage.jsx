@@ -6,14 +6,14 @@ import RouteMap from '../components/dashboard/RouteMap';
 
 const DashboardPage = () => {
   return (
-    <div className="dashboard-content">
+    <div className="dashboard-page-content">
       <Header />
-      <div className="dashboard-stats-grid">
+      <div className="stats-grid">
         <StatsSection title="Días de entrenamiento" content="workouts" />
         <StatsSection title="Total de km recorridos" content="distance" />
         <StatsSection title="Metas" content="goals" />
       </div>
-      <div className="dashboard-bottom-sections">
+      <div className="bottom-sections">
         <RecentWorkouts />
         <RouteMap />
       </div>

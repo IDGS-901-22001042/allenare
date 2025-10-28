@@ -6,7 +6,7 @@ import StatsSection from '../components/dashboard/StatsSection';
 
 const RegistroPage = () => {
   return (
-    <div className="main-content">
+    <div className="registro-content">
       <Header />
       <div> {/* Aquí hemos eliminado la clase "registro-grid" */}
         <StatsSection title="Días de entrenamiento" content="workouts" className="inline-stats" />

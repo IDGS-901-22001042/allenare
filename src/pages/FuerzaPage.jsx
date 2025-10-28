@@ -6,7 +6,7 @@ import RegistroEjercicio from '../components/entrenamientoFuerza/RegistroEjercic
 
 const FuerzaPage = () => {
   return (
-    <div className="main-content">
+    <div className="fuerza-content">
       <Header showIcons={true} />
       <div className="registro-grid">
         <StatsSection title="Días de entrenamiento (fuerza)" content="workouts" className="inline-stats" />

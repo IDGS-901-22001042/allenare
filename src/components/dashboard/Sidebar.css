@@ -8,7 +8,10 @@
   padding: 1rem 0;
   height: 70%; /* La altura se ajusta al 100% del contenedor */
   border-radius: 15px;
-  margin-left: 2rem;
+}
+
+.sidebar a {
+  text-decoration: none; /* Eliminar el subrayado de los enlaces */
 }
 
 .sidebar-icon {
@@ -23,8 +26,13 @@
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
-.sidebar-icon:hover,
-.sidebar-icon.active {
+/* Estilos para el icono cuando el enlace está activo o al pasar el ratón */
+.sidebar a.active .sidebar-icon,
+.sidebar-icon:hover {
   background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Asegúrate de que el icono activo tenga un fondo diferente */
+.sidebar a.active .sidebar-icon {
+  background-color: rgba(255, 255, 255, 0.6); /* Un poco más opaco para el activo */
 }

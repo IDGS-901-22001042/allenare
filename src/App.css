@@ -7,20 +7,24 @@ html, body {
   justify-content: center;
   align-items: center;
 }
-
 .dashboard-container {
   display: flex;
-  padding: 1.5rem;
-  max-width: 900px;
-  width: 90vw;
-  height: 85vh;
+  height: 100vh; /* Ocupa toda la altura de la ventana */
+  background-color: #f0f2f5; /* Color de fondo general */
+  padding: 1.5rem; /* Espaciado alrededor del contenedor principal */
+  box-sizing: border-box; /* Incluye padding en el cálculo de la altura/ancho */
+  max-width: 1200px; /* Ajusta según sea necesario */
+  margin: 0 auto; /* Centra el contenedor */
   align-items: center;
 }
 
-.main-content {
+.content-area {
   flex: 1;
   display: flex;
   flex-direction: column;
+  padding-right: 2rem; /* Espacio entre el contenido y el sidebar */
+  box-sizing: border-box;
+  overflow-y: auto; /* Habilita el scroll si el contenido es demasiado largo */
 }
 
 .stats-grid {
@@ -34,6 +38,73 @@ html, body {
   flex: 1;
   display: grid;
   grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+/* Estilos de la página del Dashboard */
+.dashboard-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-bottom-sections {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+/* Estilos de la página de Registro y de Fuerza */
+.registro-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.registro-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.registro-bottom-sections {
+  padding-top: 1rem;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+/* Estilos de la página de Estadísticas */
+.estadisticas-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.estadisticas-stats-grid {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.estadisticas-bottom-sections {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   align-items: stretch;
 }

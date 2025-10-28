@@ -11,9 +11,9 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-# REMOVE this variable section or just the NODE_ENV line
-# variables:
-#  NODE_ENV: production
+variables:
+  # Asegúrate de que NODE_ENV esté configurado para builds de producción
+  NODE_ENV: production
 
 stages:
 # ======================
@@ -36,11 +36,10 @@ stages:
         npm ci # Go back to using npm ci
         echo "--- npm ci finished ---"
         echo "--- Checking node_modules contents ---"
-        ls -la node_modules/.bin # Check if vite is in .bin now
-        echo "--- Running build ---"
-        # Optional: Set NODE_ENV just for the build command if necessary
-        # NODE_ENV=production ./node_modules/.bin/vite build
-        ./node_modules/.bin/vite build # Run the build
+        ls -la node_modules/.bin # Esto es útil para depuración, pero se puede remover una vez que el pipeline sea estable.
+        echo "--- Running production build ---"
+        # Usar la variable NODE_ENV definida globalmente o aquí directamente
+        ./node_modules/.bin/vite build
       displayName: 'Install dependencies and build app'
 
     - task: PublishBuildArtifacts@1
@@ -73,17 +72,17 @@ stages:
     #   displayName: 'Download build artifacts'
 
     - script: |
-        npm ci # Instalar dependencias necesarias para las pruebas
-        npm test || echo "No tests configured or tests passed/failed"
-      displayName: 'Run unit tests'
-
-    - task: PublishTestResults@2
+        echo "--- Installing dependencies for tests ---"
+        npm ci # Instalar dependencias necesarias para las pruebas (incluyendo devDependencies)
+        echo "--- Running unit tests ---"
+        npm test # Esto fallará la tarea si las pruebas fallan
+    - script: |
+      displayName: 'Publish Test Results'
+      condition: always() # Publicar resultados incluso si las pruebas fallan
       inputs:
         testResultsFormat: 'JUnit' # Asegúrate que tu test runner genera este formato
         testResultsFiles: '**/TEST-*.xml' # Ajusta el patrón si es necesario
-        failTaskOnFailedTests: true
-      condition: succeededOrFailed() # Publicar resultados incluso si las pruebas fallan
-      displayName: 'Publish Test Results'
+        failTaskOnFailedTests: true # Asegura que la tarea falle si hay pruebas fallidas
 
 # ======================
 # 3️⃣ DEPLOY STAGE
@@ -111,9 +110,11 @@ stages:
           - script: |
               echo "Deploying files from $(System.ArtifactsDirectory)/download/drop"
               # Aquí irían los comandos reales para desplegar a tu servidor/servicio
-              # Ejemplo: az webapp up, scp, etc.
-              echo "Simulating deployment..."
-              ls -R $(System.ArtifactsDirectory)/download/drop # Listar archivos para verificar
+              # EJEMPLO: az webapp deploy --resource-group <your-resource-group> --name <your-app-name> --src-path "$(System.ArtifactsDirectory)/download/drop"
+              # O: scp -r "$(System.ArtifactsDirectory)/download/drop/*" user@your-server:/var/www/html/
+              # O: rsync -avz "$(System.ArtifactsDirectory)/download/drop/" user@your-server:/var/www/html/
+              # Reemplaza esta línea con tu lógica de despliegue real:
+              ls -R $(System.ArtifactsDirectory)/download/drop # Mantener esto para verificar el contenido del artefacto antes del despliegue real
               echo "Deployment successful!"
             displayName: 'Deploy to staging environment'
           # No necesitas volver a publicar artefactos aquí usualmente
@@ -129,8 +130,8 @@ stages:
   - job: MonitorJob
     steps:
     - script: |
-        echo "Performing health check..."
-        # Reemplaza https://example.com con la URL real de tu ambiente staging
-        curl -I https://example.com || (echo "Site unreachable" && exit 1)
+        echo "--- Performing health check ---"
+        # Reemplaza 'https://example.com' con la URL real de tu ambiente de staging
+        curl -f -I https://your-staging-url.com || (echo "ERROR: Site unreachable or returned an error status" && exit 1)
         echo "Health check passed!"
       displayName: 'Check deployment health'
