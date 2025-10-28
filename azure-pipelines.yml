@@ -16,122 +16,152 @@ pool:
 #  NODE_ENV: production
 
 stages:
-# ======================
-# 1️⃣ BUILD STAGE
-# ======================
-- stage: Build
-  displayName: 'Build Stage'
-  jobs:
-  - job: BuildJob
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '20.x' # Usar Node.js 20.x
-      displayName: 'Install Node.js 20'
-
-    # Paso combinado para limpiar caché, instalar dependencias y construir
-    - script: |
-        node -v
-        npm -v
-        echo "--- Cleaning npm cache and node_modules ---"
-        npm cache clean --force # Limpiar caché de npm
-        rm -rf node_modules     # Eliminar node_modules existentes
-        echo "--- Running npm ci ---"
-        npm ci # Instalar dependencias limpiamente desde package-lock.json (incluye devDeps)
-        echo "--- npm ci finished ---"
-        echo "--- Running build ---"
-        npx vite build # Usar npx para ejecutar el build de Vite
-      displayName: 'Clean, Install Dependencies and Build App'
-
-    # Publicar los artefactos del build
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: 'dist' # Directorio de salida de Vite
-        ArtifactName: 'drop' # Nombre del artefacto
-      displayName: 'Publish Build Artifacts'
-
-# ======================
-# 2️⃣ TEST STAGE
-# ======================
-- stage: Test
-  dependsOn: Build # Depende del éxito del Build
-  displayName: 'Test Stage'
-  jobs:
-  - job: TestJob
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '20.x' # Asegurar Node.js 20.x también para las pruebas
-      displayName: 'Install Node.js 20 (for Test)'
-
-    # Instalar dependencias necesarias para ejecutar las pruebas (incluyendo devDependencies)
-    - script: |
-        echo "--- Installing dependencies for tests ---"
-        # Usamos 'npm ci' también aquí para consistencia y limpieza
-        npm ci
-        echo "--- Running tests ---"
-        # Ejecuta el script 'test' definido en package.json
-        # Asegúrate que 'npm test' genera 'junit.xml' en la raíz o subdirectorio
-        npm test
-      displayName: 'Install Deps & Run Tests'
-
-    # Publicar los resultados de las pruebas JUnit
-    - task: PublishTestResults@2
-      displayName: 'Publish Test Results JUnit'
-      condition: always() # Publicar siempre, pasen o fallen las pruebas
-      inputs:
-        testResultsFormat: 'JUnit' # Formato del reporte
-        testResultsFiles: '**/junit.xml' # Patrón para encontrar EL archivo JUnit (ajustado)
-        failTaskOnFailedTests: true # Hacer que el pipeline falle si las pruebas fallan
-        # mergeTestResults: true # Opcional: útil si generas múltiples archivos JUnit
-
-# ======================
-# 3️⃣ DEPLOY STAGE
-# ======================
-- stage: Deploy
-  dependsOn: Test # Depende del éxito de Build Y Test
-  condition: succeeded() # Solo si las etapas anteriores tuvieron éxito
-  displayName: 'Deploy Stage'
-  jobs:
-  - deployment: DeployWeb
-    environment: 'staging' # Nombre del entorno en Azure DevOps
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          # Descargar artefactos del stage de Build
-          - task: DownloadBuildArtifacts@1
+  # ======================
+  # 1️⃣ BUILD STAGE
+  # ======================
+  - stage: Build
+    displayName: "Build Stage"
+    jobs:
+      - job: BuildJob
+        steps:
+          - task: NodeTool@0
             inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'drop' # Nombre del artefacto a descargar
-              downloadPath: '$(System.ArtifactsDirectory)/download' # Carpeta de descarga
-            displayName: 'Download Build Artifacts for Deployment'
+              versionSpec: "20.x" # Usar Node.js 20.x
+            displayName: "Install Node.js 20"
 
-          # Paso para el despliegue real
+          # Paso combinado para limpiar caché, instalar dependencias y construir
           - script: |
-              echo "Deploying files from $(System.ArtifactsDirectory)/download/drop"
-              # --- INSERTA AQUÍ TUS COMANDOS DE DESPLIEGUE REALES ---
-              # EJEMPLO: az webapp deploy --resource-group <tu-rg> --name <tu-app> --src-path "$(System.ArtifactsDirectory)/download/drop"
-              # EJEMPLO: scp -r "$(System.ArtifactsDirectory)/download/drop/*" user@server:/path/to/deploy
-              # --------------------------------------------------------
-              ls -R $(System.ArtifactsDirectory)/download/drop # Verificar contenido (puedes quitar esto después)
-              echo "Deployment simulation successful!" # Cambia este mensaje cuando tengas despliegue real
-            displayName: 'Deploy to Staging Environment'
+              node -v
+              npm -v
+              echo "--- Cleaning npm cache and node_modules ---"
+              npm cache clean --force # Limpiar caché de npm
+              rm -rf node_modules     # Eliminar node_modules existentes
+              echo "--- Running npm ci ---"
+              npm ci # Instalar dependencias limpiamente desde package-lock.json (incluye devDeps)
+              echo "--- npm ci finished ---"
+              echo "--- Running build ---"
+              npx vite build # Usar npx para ejecutar el build de Vite
+            displayName: "Clean, Install Dependencies and Build App"
 
-# ======================
-# 4️⃣ MONITOR STAGE (Opcional/Ejemplo)
-# ======================
-- stage: Monitor
-  dependsOn: Deploy # Depende del éxito del Deploy
-  condition: succeeded()
-  displayName: 'Monitor Stage'
-  jobs:
-  - job: MonitorJob
-    steps:
-    - script: |
-        echo "--- Performing health check ---"
-        # Reemplaza 'https://your-staging-url.com' con la URL real
-        curl -f -I https://your-staging-url.com || (echo "ERROR: Site unreachable or returned an error status" && exit 1)
-        echo "Health check passed!"
-      displayName: 'Check Deployment Health'
+          # Publicar los artefactos del build
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: "dist" # Directorio de salida de Vite
+              ArtifactName: "drop" # Nombre del artefacto
+            displayName: "Publish Build Artifacts"
+
+  # ======================
+  # 2️⃣ TEST STAGE
+  # ======================
+  - stage: Test
+    dependsOn: Build # Depende del éxito del Build
+    displayName: "Test Stage"
+    jobs:
+      - job: TestJob
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x" # Asegurar Node.js 20.x también para las pruebas
+            displayName: "Install Node.js 20 (for Test)"
+
+          # Instalar dependencias necesarias para ejecutar las pruebas (incluyendo devDependencies)
+          - script: |
+              echo "--- Installing dependencies for tests ---"
+              # Usamos 'npm ci' también aquí para consistencia y limpieza
+              npm ci
+              echo "--- Running tests ---"
+              # Ejecuta el script 'test' definido en package.json
+              # Asegúrate que 'npm test' genera 'junit.xml' en la raíz o subdirectorio
+              npm test
+            displayName: "Install Deps & Run Tests"
+
+          # Publicar los resultados de las pruebas JUnit
+          - task: PublishTestResults@2
+            displayName: "Publish Test Results JUnit"
+            condition: always() # Publicar siempre, pasen o fallen las pruebas
+            inputs:
+              testResultsFormat: "JUnit" # Formato del reporte
+              testResultsFiles: "**/junit.xml" # Patrón para encontrar EL archivo JUnit (ajustado)
+              failTaskOnFailedTests: true # Hacer que el pipeline falle si las pruebas fallan
+              # mergeTestResults: true # Opcional: útil si generas múltiples archivos JUnit
+
+  # ======================
+  # 3️⃣ DEPLOY STAGE
+  # ======================
+  - stage: Deploy
+    dependsOn: Test # Depende del éxito de Build Y Test
+    condition: succeeded() # Solo si las etapas anteriores tuvieron éxito
+    displayName: "Deploy Stage"
+    jobs:
+      - deployment: DeployWeb
+        environment: "staging" # Nombre del entorno en Azure DevOps
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                # Descargar artefactos del stage de Build
+                - task: DownloadBuildArtifacts@1
+                  inputs:
+                    buildType: "current"
+                    downloadType: "single"
+                    artifactName: "drop" # Nombre del artefacto a descargar
+                    downloadPath: "$(System.ArtifactsDirectory)/download" # Carpeta de descarga
+                  displayName: "Download Build Artifacts for Deployment"
+
+                # Paso para el despliegue real
+                - script: |
+                    echo "Deploying files from $(System.ArtifactsDirectory)/download/drop"
+                    # --- INSERTA AQUÍ TUS COMANDOS DE DESPLIEGUE REALES ---
+                    ls -R $(System.ArtifactsDirectory)/download/drop # Verificar contenido (puedes quitar esto después)
+                    echo "Deployment simulation successful!" # Cambia este mensaje cuando tengas despliegue real
+                  displayName: "Deploy to Staging Environment"
+
+                # --- PASO PARA CERRAR WORK ITEMS ESPECÍFICOS ---
+                - task: AzureCLI@2
+                  displayName: "Close Deployed Work Items (31, 33, 36)"
+                  condition: succeeded() # Solo si el paso anterior (despliegue) fue exitoso
+                  inputs:
+                    # 👇 **IMPORTANTE:** Reemplaza con el nombre de tu Conexión de Servicio Azure
+                    azureSubscription: "<Your-Azure-Service-Connection-Name>"
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    addSpnToEnvironment: true # Necesario para la autenticación automática
+                    inlineScript: |
+                      echo "Closing specified Work Items after successful deployment..."
+
+                      # 👇 Define aquí los IDs de los Work Items a cerrar
+                      WORK_ITEM_IDS_TO_CLOSE=(31 33 36)
+
+                      # 👇 Asegúrate que 'Closed' es el nombre correcto del estado final en tu proceso
+                      TARGET_STATE="Closed"
+
+                      for WORK_ITEM_ID in "${WORK_ITEM_IDS_TO_CLOSE[@]}"; do
+                        echo "Attempting to update Work Item ID: $WORK_ITEM_ID to state '$TARGET_STATE'"
+
+                        # Comando para actualizar el estado del work item
+                        az boards work-item update --id $WORK_ITEM_ID --state "$TARGET_STATE" --org "$(System.TeamFoundationCollectionUri)" --project "$(System.TeamProject)" --debug || echo "Warning: Failed to update work item $WORK_ITEM_ID. Check permissions or state name."
+
+                        # Opcional: Añadir un comentario (descomentar si se desea)
+                        # COMMENT="Closed automatically after successful deployment by pipeline $(Build.BuildNumber) [Build ID: $(Build.BuildId)]"
+                        # az boards work-item update --id $WORK_ITEM_ID --discussion "$COMMENT" --org "$(System.TeamFoundationCollectionUri)" --project "$(System.TeamProject)"
+
+                      done
+
+                      echo "Finished attempting to close specified work items."
+
+  # ======================
+  # 4️⃣ MONITOR STAGE (Opcional/Ejemplo)
+  # ======================
+  - stage: Monitor
+    dependsOn: Deploy # Depende del éxito del Deploy
+    condition: succeeded()
+    displayName: "Monitor Stage"
+    jobs:
+      - job: MonitorJob
+        steps:
+          - script: |
+              echo "--- Performing health check ---"
+              # Reemplaza 'https://your-staging-url.com' con la URL real
+              curl -f -I https://your-staging-url.com || (echo "ERROR: Site unreachable or returned an error status" && exit 1)
+              echo "Health check passed!"
+            displayName: "Check Deployment Health"
