@@ -31,16 +31,14 @@ stages:
       displayName: 'Install Node.js 20'
 
     - script: |
-        node -v
-        npm -v
+        # ... node -v, npm -v ...
         echo "--- Running npm ci ---"
-        npm ci # Usar npm ci
+        npm ci
         echo "--- npm ci finished ---"
-        # Opcional: puedes mantener o quitar el 'ls -la node_modules/.bin'
-        # echo "--- Checking node_modules contents ---"
-        # ls -la node_modules/.bin
+        echo "--- Listing installed modules (checking for vite-plugin-pwa) ---"
+        ls -l node_modules/vite-plugin-pwa || echo "vite-plugin-pwa NOT FOUND in node_modules"
         echo "--- Running build ---"
-        npx vite build # Usar npx
+        npx vite build
       displayName: 'Install dependencies and build app'
 
     - task: PublishBuildArtifacts@1
