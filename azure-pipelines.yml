@@ -35,13 +35,19 @@ stages:
     - script: |
         node -v
         npm -v
+        echo "--- Cleaning up node_modules and npm cache ---"
+        rm -rf node_modules
+        npm cache clean --force 
         echo "--- Running npm install ---"
-        # 👇 Cambia de 'npm ci' a 'npm install'
-        npm install 
+        npm install # Forzar instalación limpia
         echo "--- npm install finished ---"
+        echo "--- Listing installed modules (checking for vite-plugin-pwa again) ---"
+        # Verifica si AHORA sí se instaló
+        ls -l node_modules/vite-plugin-pwa || echo "vite-plugin-pwa STILL NOT FOUND after npm install"
         echo "--- Running build ---"
-        npx vite build 
-      displayName: 'Install dependencies and build app'
+        # Intenta limpiar la caché de vite antes de construir
+        npx vite build --force
+      displayName: 'Clean, Install dependencies and build app'
 
 # ... (task: PublishBuildArtifacts@1) ...
 
