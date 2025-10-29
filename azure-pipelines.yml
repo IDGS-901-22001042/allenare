@@ -106,7 +106,7 @@ stages:
             displayName: 'Deploy to Azure App Service (staging)'
             inputs:
               # 👇 Usa el nombre correcto de tu Conexión de Servicio
-              azureSubscription: 'allenare'
+              azureSubscription: 'AzureAllenareConnection'
               # 👇 Ajusta si usas Windows App Service ('webApp')
               appType: 'webAppLinux'
               # 👇 **CAMBIO 1:** Reemplaza con el nombre EXACTO de tu App Service en Azure
@@ -121,7 +121,7 @@ stages:
             condition: succeeded()
             inputs:
               # 👇 Usa el mismo nombre de conexión de servicio
-              azureSubscription: 'allenare'
+              azureSubscription: 'AzureAllenareConnection'
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               addSpnToEnvironment: true
