@@ -1,5 +1,5 @@
 # ==========================================
-# PIPELINE CI/CD para Node.js + React (Vite)
+# PIPELINE CI/CD para Node.js + React (Vite) -> Deploy a Azure App Service
 # ==========================================
 
 trigger:
@@ -11,7 +11,7 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-# NO definir NODE_ENV globalmente para asegurar que npm ci/install incluyan devDependencies
+# NO definir NODE_ENV globalmente
 # variables:
 #  NODE_ENV: production
 
@@ -26,75 +26,67 @@ stages:
     steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '20.x' # Usar Node.js 20.x
+        versionSpec: '20.x'
       displayName: 'Install Node.js 20'
 
-    # Paso combinado para limpiar caché, instalar dependencias y construir
     - script: |
         node -v
         npm -v
         echo "--- Cleaning npm cache and node_modules ---"
-        npm cache clean --force # Limpiar caché de npm
-        rm -rf node_modules     # Eliminar node_modules existentes
+        npm cache clean --force
+        rm -rf node_modules
         echo "--- Running npm ci ---"
-        npm ci # Instalar dependencias limpiamente desde package-lock.json (incluye devDeps)
+        npm ci
         echo "--- npm ci finished ---"
         echo "--- Running build ---"
-        npx vite build # Usar npx para ejecutar el build de Vite
+        npx vite build
       displayName: 'Clean, Install Dependencies and Build App'
 
-    # Publicar los artefactos del build
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: 'dist' # Directorio de salida de Vite
-        ArtifactName: 'drop' # Nombre del artefacto
+        PathtoPublish: 'dist'
+        ArtifactName: 'drop'
       displayName: 'Publish Build Artifacts'
 
 # ======================
 # 2️⃣ TEST STAGE
 # ======================
 - stage: Test
-  dependsOn: Build # Depende del éxito del Build
+  dependsOn: Build
   displayName: 'Test Stage'
   jobs:
   - job: TestJob
     steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '20.x' # Asegurar Node.js 20.x también para las pruebas
+        versionSpec: '20.x'
       displayName: 'Install Node.js 20 (for Test)'
 
-    # Instalar dependencias necesarias para ejecutar las pruebas (incluyendo devDependencies)
     - script: |
         echo "--- Installing dependencies for tests ---"
-        # Usamos 'npm ci' también aquí para consistencia y limpieza
         npm ci
         echo "--- Running tests ---"
-        # Ejecuta el script 'test' definido en package.json
-        # Asegúrate que 'npm test' genera 'junit.xml' en la raíz o subdirectorio
         npm test
       displayName: 'Install Deps & Run Tests'
 
-    # Publicar los resultados de las pruebas JUnit
     - task: PublishTestResults@2
       displayName: 'Publish Test Results JUnit'
-      condition: always() # Publicar siempre, pasen o fallen las pruebas
+      condition: always()
       inputs:
-        testResultsFormat: 'JUnit' # Formato del reporte
-        testResultsFiles: '**/junit.xml' # Patrón para encontrar EL archivo JUnit (ajustado)
-        failTaskOnFailedTests: true # Hacer que el pipeline falle si las pruebas fallan
-        # mergeTestResults: true # Opcional: útil si generas múltiples archivos JUnit
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/junit.xml'
+        failTaskOnFailedTests: true
 
 # ======================
-# 3️⃣ DEPLOY STAGE
+# 3️⃣ DEPLOY STAGE to Azure App Service
 # ======================
 - stage: Deploy
-  dependsOn: Test # Depende del éxito de Build Y Test
-  condition: succeeded() # Solo si las etapas anteriores tuvieron éxito
-  displayName: 'Deploy Stage'
+  dependsOn: Test
+  condition: succeeded()
+  displayName: 'Deploy Stage to Azure App Service'
   jobs:
   - deployment: DeployWeb
-    environment: 'staging' # Nombre del entorno en Azure DevOps
+    environment: 'staging'
     strategy:
       runOnce:
         deploy:
@@ -104,59 +96,51 @@ stages:
             inputs:
               buildType: 'current'
               downloadType: 'single'
-              artifactName: 'drop' # Nombre del artefacto a descargar
-              downloadPath: '$(System.ArtifactsDirectory)/download' # Carpeta de descarga
+              artifactName: 'drop'
+              # Descarga a una carpeta específica para la tarea de despliegue
+              downloadPath: '$(System.ArtifactsDirectory)/app'
             displayName: 'Download Build Artifacts for Deployment'
 
-          # Paso para el despliegue real
-          - script: |
-              echo "Deploying files from $(System.ArtifactsDirectory)/download/drop"
-              # --- INSERTA AQUÍ TUS COMANDOS DE DESPLIEGUE REALES ---
-              # EJEMPLO: az webapp deploy --resource-group <tu-rg> --name <tu-app> --src-path "$(System.ArtifactsDirectory)/download/drop"
-              # EJEMPLO: scp -r "$(System.ArtifactsDirectory)/download/drop/*" user@server:/path/to/deploy
-              # --------------------------------------------------------
-              ls -R $(System.ArtifactsDirectory)/download/drop # Verificar contenido (puedes quitar esto después)
-              echo "Deployment simulation successful!" # Cambia este mensaje cuando tengas despliegue real
-            displayName: 'Deploy to Staging Environment'
+          # --- TAREA PARA DESPLEGAR A AZURE APP SERVICE ---
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure App Service (staging)'
+            inputs:
+              # 👇 Usa el nombre correcto de tu Conexión de Servicio
+              azureSubscription: 'IDGS-901-22001042'
+              # 👇 Ajusta si usas Windows App Service ('webApp')
+              appType: 'webAppLinux'
+              # 👇 **CAMBIO 1:** Reemplaza con el nombre EXACTO de tu App Service en Azure
+              appName: 'allenare'
+              # 👇 Ruta a la carpeta con los archivos construidos
+              package: '$(System.ArtifactsDirectory)/app/drop'
+              # deploymentMethod: 'auto' # Generalmente 'auto' o 'zipDeploy' funcionan bien
 
-          # --- PASO PARA CERRAR WORK ITEMS ESPECÍFICOS ---
+          # --- PASO PARA CERRAR WORK ITEMS ESPECÍFICOS (sin cambios respecto al anterior de App Service) ---
           - task: AzureCLI@2
             displayName: 'Close Deployed Work Items (31, 33, 36)'
-            condition: succeeded() # Solo si el paso anterior (despliegue) fue exitoso
+            condition: succeeded()
             inputs:
-              # 👇 **IMPORTANTE:** Reemplaza con el nombre de tu Conexión de Servicio Azure
-              azureSubscription: 'https://dev.azure.com/allenare/allenare/'
+              # 👇 Usa el mismo nombre de conexión de servicio
+              azureSubscription: 'IDGS-901-22001042'
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
-              addSpnToEnvironment: true # Necesario para la autenticación automática
+              addSpnToEnvironment: true
               inlineScript: |
                 echo "Closing specified Work Items after successful deployment..."
-
-                # 👇 Define aquí los IDs de los Work Items a cerrar
                 WORK_ITEM_IDS_TO_CLOSE=(31 33 36)
-
-                # 👇 Asegúrate que 'Closed' es el nombre correcto del estado final en tu proceso
+                # 👇 Verifica que 'Closed' sea el estado correcto en Azure Boards
                 TARGET_STATE="Closed"
-
                 for WORK_ITEM_ID in "${WORK_ITEM_IDS_TO_CLOSE[@]}"; do
                   echo "Attempting to update Work Item ID: $WORK_ITEM_ID to state '$TARGET_STATE'"
-
-                  # Comando para actualizar el estado del work item
-                  az boards work-item update --id $WORK_ITEM_ID --state "$TARGET_STATE" --org "$(System.TeamFoundationCollectionUri)" --project "$(System.TeamProject)" --debug || echo "Warning: Failed to update work item $WORK_ITEM_ID. Check permissions or state name."
-
-                  # Opcional: Añadir un comentario (descomentar si se desea)
-                  # COMMENT="Closed automatically after successful deployment by pipeline $(Build.BuildNumber) [Build ID: $(Build.BuildId)]"
-                  # az boards work-item update --id $WORK_ITEM_ID --discussion "$COMMENT" --org "$(System.TeamFoundationCollectionUri)" --project "$(System.TeamProject)"
-
+                  az boards work-item update --id $WORK_ITEM_ID --state "$TARGET_STATE" --org "$(System.TeamFoundationCollectionUri)" --project "$(System.TeamProject)" --debug || echo "Warning: Failed to update work item $WORK_ITEM_ID."
                 done
-
                 echo "Finished attempting to close specified work items."
 
 # ======================
-# 4️⃣ MONITOR STAGE (Opcional/Ejemplo)
+# 4️⃣ MONITOR STAGE (Opcional/Ejemplo) YA ES ESTE AAAA
 # ======================
 - stage: Monitor
-  dependsOn: Deploy # Depende del éxito del Deploy
+  dependsOn: Deploy
   condition: succeeded()
   displayName: 'Monitor Stage'
   jobs:
@@ -164,7 +148,7 @@ stages:
     steps:
     - script: |
         echo "--- Performing health check ---"
-        # Reemplaza 'https://your-staging-url.com' con la URL real
-        curl -f -I https://dev.azure.com/allenare/allenare/ || (echo "ERROR: Site unreachable or returned an error status" && exit 1)
+        # 👇 **CAMBIO 2:** Reemplaza con la URL PÚBLICA de tu App Service desplegada
+        curl -f -I https://allenare.azurewebsites.net || (echo "ERROR: Site unreachable or returned an error status" && exit 1)
         echo "Health check passed!"
       displayName: 'Check Deployment Health'
