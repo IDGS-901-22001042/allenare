@@ -121,7 +121,7 @@ stages:
             condition: succeeded()
             inputs:
               # 👇 Usa el mismo nombre de conexión de servicio
-              azureSubscription: 'IDGS-901-22001042'
+              azureSubscription: 'allenare'
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               addSpnToEnvironment: true
