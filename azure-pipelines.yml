@@ -149,6 +149,6 @@ stages:
     - script: |
         echo "--- Performing health check ---"
         # 👇 **CAMBIO 2:** Reemplaza con la URL PÚBLICA de tu App Service desplegada
-        curl -f -I https://allenare.azurewebsites.net || (echo "ERROR: Site unreachable or returned an error status" && exit 1)
+        curl -f -I https://allenare-fnfjg7crgyd7bqf9.canadacentral-01.azurewebsites.net || (echo "ERROR: Site unreachable or returned an error status" && exit 1)
         echo "Health check passed!"
       displayName: 'Check Deployment Health'
