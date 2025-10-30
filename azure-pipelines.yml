@@ -137,7 +137,7 @@ stages:
                 echo "Finished attempting to close specified work items."
 
 # ======================
-# 4️⃣ MONITOR STAGE (Opcional/Ejemplo) YA ES ESTE AAAA
+# 4️⃣ MONITOR STAGE (Opcional/Ejemplo)
 # ======================
 - stage: Monitor
   dependsOn: Deploy
