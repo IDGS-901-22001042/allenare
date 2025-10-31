@@ -8,12 +8,4 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 # Allenare-PWA
-
-# Allenare-PWA
-
-A new PWA
-Allenare is a Fit training App for everyone
-Testing Notifications and more
-Another Testing jaja
-Adding things
-ADDD
+Correccioens para pruebas en Azure
