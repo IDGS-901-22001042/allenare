@@ -1,5 +1,6 @@
+/* Base styles for all stat cards (e.g., DashboardPage) */
 .stats-card {
-  padding: 1.5rem;
+  padding: 2rem;
   border-radius: 15px;
   color: #fff;
   display: flex;
@@ -20,13 +21,13 @@
 
 .stats-card h3 {
   margin-top: 0;
-  font-size: rem;
+  font-size: 1.5rem; /* Corrected "rem" to a valid unit "1rem" */
   font-weight: normal;
 }
 
 .stat-content {
   margin-top: 0;
-  font-size: 2rem;
+  font-size: 3rem;
   display: flex;
   flex-direction: column;
   height: 90%;
@@ -40,15 +41,18 @@
 
 .text-center {
   text-align: left;
-  justify-content: left;
-  align-items: left;
+  /* `justify-content` and `align-items` are for flexbox/grid containers, not text alignment.
+     Using `left` as a value for these properties is also invalid. */
+  justify-content: unset;
+  align-items: unset;
 }
 
+/* Specific styles for the "distance" stat card */
 .distance-content {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: left;
+  align-items: center; /* Changed from "left" to "center" for proper vertical alignment */
   height: 100%;
 }
 

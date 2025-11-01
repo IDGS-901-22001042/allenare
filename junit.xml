@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="12" failures="0" errors="0" time="0.5240449">
+    <testsuite name="src/simple.test.jsx" timestamp="2025-10-28T20:41:03.870Z" hostname="AsusTUFGaming" tests="1" failures="0" errors="0" skipped="0" time="0.0018385">
+        <testcase classname="src/simple.test.jsx" name="Simple Test Suite &gt; should pass" time="0.0009326">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/pages/LoginForm.test.jsx" timestamp="2025-10-28T20:41:03.871Z" hostname="AsusTUFGaming" tests="3" failures="0" errors="0" skipped="0" time="0.1645577">
+        <testcase classname="src/pages/LoginForm.test.jsx" name="LoginForm Component &gt; debería renderizar el formulario correctamente" time="0.1046893">
+            <system-err>
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/pages/LoginForm.test.jsx" name="LoginForm Component &gt; debería mostrar mensaje de error con credenciales incorrectas" time="0.0371116">
+        </testcase>
+        <testcase classname="src/pages/LoginForm.test.jsx" name="LoginForm Component &gt; debería llamar a onLogin y navegar con credenciales correctas" time="0.0207866">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/entrenamientoFuerza/RegistroEjercicio.test.jsx" timestamp="2025-10-28T20:41:03.873Z" hostname="AsusTUFGaming" tests="4" failures="0" errors="0" skipped="0" time="0.1778381">
+        <testcase classname="src/components/entrenamientoFuerza/RegistroEjercicio.test.jsx" name="RegistroEjercicio Component &gt; debería renderizar todos los campos y el botón" time="0.0983051">
+        </testcase>
+        <testcase classname="src/components/entrenamientoFuerza/RegistroEjercicio.test.jsx" name="RegistroEjercicio Component &gt; debería actualizar los valores de los inputs al escribir" time="0.0137553">
+        </testcase>
+        <testcase classname="src/components/entrenamientoFuerza/RegistroEjercicio.test.jsx" name="RegistroEjercicio Component &gt; debería llamar a onAddWorkout con los datos correctos y limpiar el formulario al enviar datos válidos" time="0.0477063">
+        </testcase>
+        <testcase classname="src/components/entrenamientoFuerza/RegistroEjercicio.test.jsx" name="RegistroEjercicio Component &gt; NO debería llamar a onAddWorkout y debería mostrar alerta si faltan campos requeridos" time="0.0167749">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/registros/RegistroFormulario.test.jsx" timestamp="2025-10-28T20:41:03.874Z" hostname="AsusTUFGaming" tests="4" failures="0" errors="0" skipped="0" time="0.1798106">
+        <testcase classname="src/components/registros/RegistroFormulario.test.jsx" name="RegistroFormulario Component &gt; debería renderizar todos los campos y el botón" time="0.0894291">
+        </testcase>
+        <testcase classname="src/components/registros/RegistroFormulario.test.jsx" name="RegistroFormulario Component &gt; debería actualizar los valores de los inputs al escribir" time="0.0105733">
+        </testcase>
+        <testcase classname="src/components/registros/RegistroFormulario.test.jsx" name="RegistroFormulario Component &gt; debería llamar a onAddWorkout con los datos correctos y limpiar el formulario al enviar datos válidos" time="0.0583906">
+        </testcase>
+        <testcase classname="src/components/registros/RegistroFormulario.test.jsx" name="RegistroFormulario Component &gt; NO debería llamar a onAddWorkout y debería mostrar alerta si faltan campos requeridos" time="0.0199166">
+        </testcase>
+    </testsuite>
+</testsuites>

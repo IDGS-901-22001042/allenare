@@ -13,7 +13,7 @@ const renderContent = (type) => {
     case 'distance':
       return (
         <div className="stat-content text-center distance-content">
-          <div className="distance-text-group"> {/* Nuevo div para agrupar texto */}
+          <div className="distance-text-group">
             <p className="main-stat">24 km</p>
             <p className="sub-stat">¡Estás en racha!</p>
           </div>
@@ -32,9 +32,9 @@ const renderContent = (type) => {
   }
 };
 
-const StatsSection = ({ title, content }) => {
+const StatsSection = ({ title, content, className }) => {
   return (
-    <div className="stats-card">
+    <div className={`stats-card ${className || ''}`}>
       <h3>{title}</h3>
       {renderContent(content)}
     </div>
