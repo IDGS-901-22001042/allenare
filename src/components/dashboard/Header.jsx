@@ -10,7 +10,7 @@ const Header = ({ showIcons = true, username = "(username)", email = "(correo)" 
           <img src="https://graph.facebook.com/1449527692254051/picture?height=256&width=256" alt="User Avatar" className="avatar" />
         </Link>
         <div className="user-info">
-          <h1>Bienvenido, {username}!</h1>
+          <h1>Welcome, {username}!</h1>
           <p>{email}</p>
         </div>
       </div>
