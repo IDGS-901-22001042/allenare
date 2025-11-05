@@ -117,7 +117,7 @@ stages:
 
           # --- PASO PARA CERRAR WORK ITEMS ESPECÍFICOS (sin cambios respecto al anterior de App Service) ---
           - task: AzureCLI@2
-            displayName: 'Close Deployed Work Items (37)'
+            displayName: 'Close Deployed Work Items (38)'
             condition: succeeded()
             inputs:
               # 👇 Usa el mismo nombre de conexión de servicio
@@ -127,7 +127,7 @@ stages:
               addSpnToEnvironment: true
               inlineScript: |
                 echo "Closing specified Work Items after successful deployment..."
-                WORK_ITEM_IDS_TO_CLOSE=(37)
+                WORK_ITEM_IDS_TO_CLOSE=(38)
                 # 👇 Verifica que 'Closed' sea el estado correcto en Azure Boards
                 TARGET_STATE="Closed"
                 for WORK_ITEM_ID in "${WORK_ITEM_IDS_TO_CLOSE[@]}"; do
